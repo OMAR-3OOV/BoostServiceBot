@@ -144,10 +144,9 @@ public class TicketManagerEvent extends ListenerAdapter {
                                 if (!event.getInteraction().getMessage().getButtons().isEmpty()) {
                                     List<Button> buttons = new ArrayList<>();
                                     event.getInteraction().getMessage().getButtons().forEach(b -> {
-                                        buttons.add(b.asDisabled());
                                     });
 
-                                    event.getInteraction().editMessageEmbeds(embed.build()).setActionRows(ActionRow.of(menu.build()), ActionRow.of(buttons)).queue();
+                                    event.getInteraction().editMessageEmbeds(embed.build()).setActionRow(menu.build()).queue();
                                 } else {
                                     event.getInteraction().editMessageEmbeds(embed.build()).queue();
                                 }
@@ -174,12 +173,7 @@ public class TicketManagerEvent extends ListenerAdapter {
                             }
 
                             if (!event.getInteraction().getMessage().getButtons().isEmpty()) {
-                                List<Button> buttons = new ArrayList<>();
-                                event.getInteraction().getMessage().getButtons().forEach(b -> {
-                                    buttons.add(b.asDisabled());
-                                });
-
-                                event.getInteraction().editMessageEmbeds(embed.build()).setActionRows(ActionRow.of(menu.build()), ActionRow.of(buttons)).queue();
+                                event.getInteraction().editMessageEmbeds(embed.build()).setActionRow(menu.build()).queue();
                             } else {
                                 event.getInteraction().editMessageEmbeds(embed.build()).queue();
                             }
