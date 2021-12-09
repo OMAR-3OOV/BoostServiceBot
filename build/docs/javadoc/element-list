@@ -1,0 +1,14 @@
+system
+system.commands
+system.commands.Information
+system.commands.Managements
+system.commands.Managements.TicketManager
+system.listeners
+system.utilities
+system.utilities.DataBase
+system.utilities.DataBase.GuildUtility
+system.utilities.languageManager
+system.utilities.manager
+system.utilities.proifleManager
+system.utilities.StringUtilities
+system.utilities.TicektManagerUtility
