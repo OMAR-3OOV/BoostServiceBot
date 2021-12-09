@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
@@ -31,7 +31,7 @@ public class TicketManagerCommand implements Command {
     public static HashMap<Message, EmbedBuilder> Embed = new HashMap<>();
 
     @Override
-    public void handle(List<String> args, GuildMessageReceivedEvent event) throws IOException {
+    public void handle(List<String> args, MessageReceivedEvent event) throws IOException {
 
         User user = event.getAuthor();
 
@@ -54,6 +54,14 @@ public class TicketManagerCommand implements Command {
         embed.setTitle("Ticket Control panel " + Emoji.fromUnicode("\uD83D\uDCE7").getName());
 
         StringBuilder description = embed.getDescriptionBuilder();
+
+        if (guildManager.getTicketsCategory() == null) {
+            description.append(new String(languageManager.getMessage(MessageKeys.TICKET_CONTROLPANEL_DESCRIPTION_TCATEGORY)).replaceAll("<category>", "-"));
+            description.append("\n");
+        } else {
+            description.append(new String(languageManager.getMessage(MessageKeys.TICKET_CONTROLPANEL_DESCRIPTION_TCATEGORY)).replaceAll("<category>", guildManager.getTicketsCategory().getAsMention()));
+            description.append("\n");
+        }
 
         if (guildManager.getTicketCategory() != null) {
             description.append(new String(languageManager.getMessage(MessageKeys.TICKET_CONTROLPANEL_DESCRIPTION_CATEGORY)).replaceAll("<category>", guildManager.getTicketCategory().getAsMention()));
@@ -88,7 +96,7 @@ public class TicketManagerCommand implements Command {
         embed.setFooter(languageManager.getMessage(MessageKeys.TICKET_CONTORLPANEL_FLOOR));
 
         List<SelectOption> menuOption = new ArrayList<>();
-        menuOption.add(SelectOption.of("Ticket Main", "ticket-control-panel-main").withDescription("The main menu of the ticket control panel").withDefault(true).withEmoji(Emoji.fromUnicode("\uD83D\uDCE7")));
+        menuOption.add(SelectOption.of("Ticket Main", "ticket-control-panel-main").withDescription("The main menu of the ticket control panel").withEmoji(Emoji.fromUnicode("\uD83D\uDCE7")));
         menuOption.add(SelectOption.of("Ticket Manager", "ticket-control-panel-manager").withDescription("to change the settings of ticket message").withEmoji(Emoji.fromUnicode("\uD83D\uDDC4")));
         menuOption.add(SelectOption.of("Ticket History", "ticket-control-panel-history").withDescription("to get the current history of tickets").withEmoji(Emoji.fromUnicode("\uD83D\uDCD6")));
         menuOption.add(SelectOption.of("Delete", "ticket-control-panel-delete").withDescription("to delete the message").withEmoji(Emoji.fromUnicode("\uD83D\uDDD1")));

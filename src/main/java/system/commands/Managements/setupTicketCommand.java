@@ -3,7 +3,7 @@ package system.commands.Managements;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -25,7 +25,7 @@ import java.util.List;
 public class setupTicketCommand implements Command {
 
     @Override
-    public void handle(List<String> args, GuildMessageReceivedEvent event) throws IOException {
+    public void handle(List<String> args, MessageReceivedEvent event) throws IOException {
         try {
             GuildManager guildManager = new GuildManager(event.getGuild());
 
@@ -36,24 +36,35 @@ public class setupTicketCommand implements Command {
                 if (event.getGuild().getCategoryCache().stream().anyMatch(cate -> cate.getName().equalsIgnoreCase("support"))) {
                     category = event.getGuild().getCategoriesByName("support", false).stream().findFirst().get();
                     guildManager.setCategoryTicket(category.getId());
+                    guildManager.setCategoryTickets(category.getId());
                 } else {
                     category = event.getGuild().createCategory("support").complete();
                     guildManager.setCategoryTicket(category.getId());
+                    guildManager.setCategoryTickets(category.getId());
                 }
 
-                if (event.getGuild().getTextChannels().stream().anyMatch(tc -> tc.getName().equalsIgnoreCase("ticket") && tc.getParent().getName().equalsIgnoreCase("support"))) {
+                if (event.getGuild().getTextChannels().stream().anyMatch(tc -> tc.getName().equalsIgnoreCase("ticket") && tc.getParentCategory().getName().equalsIgnoreCase("support"))) {
                     textChannel = event.getGuild().getTextChannelsByName("ticket", false).stream().findFirst().get();
                     guildManager.setChannelTicket(textChannel.getId());
                 } else {
                     textChannel = category.createTextChannel("ticket").complete();
-                    textChannel.createPermissionOverride(event.getGuild().getRoleCache().stream().filter(f -> f.isPublicRole()).findFirst().get()).setDeny(Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION, Permission.USE_PUBLIC_THREADS, Permission.USE_PRIVATE_THREADS, Permission.MANAGE_THREADS).queue();
+                    textChannel.createPermissionOverride(event.getGuild().getRoleCache().stream().filter(f -> f.isPublicRole()).findFirst().get()).setDeny(Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION, Permission.CREATE_PUBLIC_THREADS, Permission.CREATE_PRIVATE_THREADS, Permission.MANAGE_THREADS).queue();
                     guildManager.setChannelTicket(textChannel.getId());
                 }
 
                 if (guildManager.getMessageChannel() == null) {
-                    TicketUtility ticketUtility = new TicketUtility(event.getChannel(), event.getGuild());
+                    TicketUtility ticketUtility = new TicketUtility(event.getTextChannel(), event.getGuild());
 
-                    Message message = textChannel.sendMessageEmbeds(ticketUtility.embedTicketMessage().build()).setActionRow(Button.primary("open-ticket", "Open ticket")).complete();
+                    List<SelectOption> options = new ArrayList<>();
+                    Arrays.stream(Languages.values()).forEach(languages -> {
+                        options.add(SelectOption.of(languages.getDisplayName(),"option-open-language-"+languages.getKey()).withEmoji(languages.getEmoji()));
+                    });
+
+                    SelectionMenu.Builder menu = SelectionMenu.create("ticket-open-select-language");
+                    menu.setRequiredRange(1, 1);
+                    menu.addOptions(options);
+
+                    Message message = textChannel.sendMessageEmbeds(ticketUtility.embedTicketMessage().build()).setActionRows(ActionRow.of(menu.build()), ActionRow.of(Button.primary("open-ticket", "Open ticket"))).complete();
                     guildManager.setMessageTicket(message.getId());
                     guildManager.setSetup(true);
                 } else {
@@ -72,7 +83,7 @@ public class setupTicketCommand implements Command {
 
                 if (event.getGuild().getTextChannels().stream().noneMatch(tc -> tc.getName().equalsIgnoreCase("ticket"))) {
                     textChannel = category.createTextChannel("ticket").complete();
-                    textChannel.createPermissionOverride(event.getGuild().getRoleCache().stream().filter(f -> f.isPublicRole()).findFirst().get()).setDeny(Permission.MESSAGE_WRITE, Permission.MESSAGE_ADD_REACTION, Permission.USE_PUBLIC_THREADS, Permission.USE_PRIVATE_THREADS, Permission.MANAGE_THREADS).queue();
+                    textChannel.createPermissionOverride(event.getGuild().getRoleCache().stream().filter(f -> f.isPublicRole()).findFirst().get()).setDeny(Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION, Permission.CREATE_PUBLIC_THREADS, Permission.CREATE_PUBLIC_THREADS, Permission.MANAGE_THREADS).queue();
                     guildManager.setChannelTicket(textChannel.getId());
                 } else {
                     assert category != null;
@@ -80,7 +91,7 @@ public class setupTicketCommand implements Command {
                 }
 
                 if (guildManager.getMessageChannel() == null) {
-                    TicketUtility ticketUtility = new TicketUtility(event.getChannel(), event.getGuild());
+                    TicketUtility ticketUtility = new TicketUtility(event.getTextChannel(), event.getGuild());
 
                     List<SelectOption> options = new ArrayList<>();
                     Arrays.stream(Languages.values()).forEach(languages -> {
@@ -88,8 +99,8 @@ public class setupTicketCommand implements Command {
                     });
 
                     SelectionMenu.Builder menu = SelectionMenu.create("ticket-open-select-language");
-                    menu.addOptions(options);
                     menu.setRequiredRange(1, 1);
+                    menu.addOptions(options);
 
                     Message message = textChannel.sendMessageEmbeds(ticketUtility.embedTicketMessage().build()).setActionRows(ActionRow.of(menu.build()), ActionRow.of(Button.primary("open-ticket", "Open ticket"))).complete();
                     guildManager.setMessageTicket(message.getId());

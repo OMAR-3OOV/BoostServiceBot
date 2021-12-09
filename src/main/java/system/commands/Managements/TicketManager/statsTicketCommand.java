@@ -4,7 +4,7 @@ import com.github.marlonlom.utilities.timeago.TimeAgo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import system.Core;
 import system.utilities.DataBase.GuildUtility.GuildManager;
@@ -25,11 +25,11 @@ import java.util.regex.Matcher;
 public class statsTicketCommand implements Command {
 
     @Override
-    public void handle(List<String> args, GuildMessageReceivedEvent event) throws IOException {
+    public void handle(List<String> args, MessageReceivedEvent event) throws IOException {
         try {
             GuildManager guildManager = new GuildManager(event.getGuild());
             LanguageManager languageManager = new LanguageManager(event.getGuild());
-            TicketCreateUtility ticketCreate = new TicketCreateUtility(event.getChannel(), event.getGuild());
+            TicketCreateUtility ticketCreate = new TicketCreateUtility(event.getTextChannel(), event.getGuild());
             CartUtility cart = new CartUtility(ticketCreate.getCreatorByProperties(), ticketCreate.getTextChannel());
 
             if (ticketCreate.getTextChannel().equals(event.getChannel())) {

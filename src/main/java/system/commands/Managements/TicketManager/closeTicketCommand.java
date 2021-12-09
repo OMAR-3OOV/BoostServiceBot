@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import system.Core;
 import system.utilities.DataBase.GuildUtility.GuildManager;
@@ -19,15 +19,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+//abstract
 public class closeTicketCommand implements Command {
 
     public static HashMap<User, TextChannel> ticketchannel = new HashMap<>();
     public static HashMap<User, String> reason = new HashMap<>();
 
     @Override
-    public void handle(List<String> args, GuildMessageReceivedEvent event) throws IOException {
-        TicketCreateUtility ticketCreate = new TicketCreateUtility(event.getChannel(), event.getGuild());
+    public void handle(List<String> args, MessageReceivedEvent event) throws IOException {
+        TicketCreateUtility ticketCreate = new TicketCreateUtility(event.getTextChannel(), event.getGuild());
 
         if (ticketCreate.getTextChannel() != null) {
             try {

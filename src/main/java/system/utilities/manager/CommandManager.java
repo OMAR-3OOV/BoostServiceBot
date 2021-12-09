@@ -3,9 +3,8 @@ package system.utilities.manager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import system.commands.Information.profileCommand;
 import system.commands.Managements.TicketManager.TicketManagerCommand;
 import system.commands.Managements.TicketManager.closeTicketCommand;
 import system.commands.Managements.TicketManager.statsTicketCommand;
@@ -29,7 +28,6 @@ public class CommandManager {
             Commands that applies to bot !
          */
 
-        addCommand(new profileCommand());
         addCommand(new setupTicketCommand());
         addCommand(new TicketManagerCommand());
         addCommand(new closeTicketCommand());
@@ -72,7 +70,7 @@ public class CommandManager {
         return categories.values();
     }
 
-    public void handleCommand(GuildMessageReceivedEvent event, String prefix) throws IOException {
+    public void handleCommand(MessageReceivedEvent event, String prefix) throws IOException {
         final String[] split = event.getMessage().getContentRaw().replaceFirst(prefix, "").split("\\s+");
         final String invoke = split[0].toLowerCase();
 

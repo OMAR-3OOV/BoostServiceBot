@@ -75,6 +75,7 @@ public class GuildManager {
                     properties.setProperty("ticket-channel-id", "none");
                     properties.setProperty("ticket-category-id", "none");
                     properties.setProperty("ticket-message-id", "none");
+                    properties.setProperty("tickets-category", "none");
                     properties.setProperty("setup", String.valueOf(false));
                     properties.setProperty("maintenance", String.valueOf(false));
                     properties.setProperty("language", String.valueOf(languageManager.getDefaultLanguage().getId()));
@@ -109,6 +110,12 @@ public class GuildManager {
         if (properties.getProperty("ticket-category-id").isEmpty() || properties.getProperty("ticket-category-id").equalsIgnoreCase("none"))
             return null;
         return this.guild.getCategoryById(properties.getProperty("ticket-category-id"));
+    }
+
+    public final Category getTicketsCategory() {
+        if (properties.getProperty("tickets-category").isEmpty() || properties.getProperty("tickets-category").equalsIgnoreCase("none"))
+            return null;
+        return this.guild.getCategoryById(properties.getProperty("tickets-category"));
     }
 
     public final String getTicketChannelId() {
@@ -181,6 +188,16 @@ public class GuildManager {
             properties.put("ticket-category-id", id);
             fileSave();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setCategoryTickets(String id) {
+        try {
+            properties.setProperty("tickets-category", id);
+            fileSave();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
     }
